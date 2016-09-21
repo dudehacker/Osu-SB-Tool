@@ -18,4 +18,4 @@ mp3 -> osb
 
 
 ### Lyrics Effect
-https://osu.ppy.sh/ss/6142485
+![alt tag](https://osu.ppy.sh/ss/6142485)
