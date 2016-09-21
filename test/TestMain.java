@@ -7,6 +7,7 @@ import effects.Effects;
 import effects.customEffects.TextDisplay;
 import effects.customEffects.WaterDrop;
 import Storyboard.Storyboard;
+import Utils.OsuUtils;
 
 
 public class TestMain {
@@ -19,9 +20,14 @@ public class TestMain {
 	}
 	
 	private void testTextDisplay(){
-		String s = "*‚Ð•½‚©";
+		String s = "1. Mattete Ainouta - Aqours";
+		/*
+		for (int i = 0; i<s.length();i++){
+			char ch = s.charAt(i);
+			System.out.println(""+ch+ "  =  " +OsuUtils.characterToUnicode(ch));
+		}*/
 		Storyboard sb = new  Storyboard(false);
-		Effects e1 = new TextDisplay(s,3000, 5000,  100, 100, 2, 90,true);
+		Effects e1 = new TextDisplay(s,3000, 10000,  0, 150, 0.2 , 0,true);
 		sb.add(e1);
 		System.out.println(sb.toString());
 	}

@@ -60,6 +60,9 @@ public class VectorScale extends Command {
 		String y = String.format(f,endScaleY-startScaleY);
 		String x = String.format(f,endScaleX-startScaleX); 
 		if (x.equals(y)){
+			if (startX.equals(endX)){
+				return " S,"+easing+","+startTime+","+endTime+","+startX;
+			}
 			return " S,"+easing+","+startTime+","+endTime+","+startX+","+endX;
 		}
 		return " S,"+easing+","+startTime+","+endTime+","+startX+","+startY+","+endX+","+endY;

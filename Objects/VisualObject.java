@@ -91,7 +91,7 @@ public abstract class VisualObject {
 	}
 	
 	public String toString(){
-		commands.sort(Command.StartTimeComparator);
+		sortByStartTime();
 		String output = getHeader() + nl;
 		for (Command c: commands){
 			output += c.toString() + nl;

@@ -6,7 +6,7 @@ import Utils.*;
 import effects.*;
 
 /**
- * Only for English alphabet and numbers.
+ * 
  * @author DH
  *
  */
@@ -39,18 +39,18 @@ public class TextDisplay extends Effects{
 			if (ch != ' '){
 				String s = ""+ch;
 				// use Unicode for the font name if the char is not supported in windows or Japanese character
-				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch)){
+				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch) || Character.isUpperCase(ch)){
 					s = OsuUtils.characterToUnicode(ch);
 				} 
 				String filePath = path + s + ".png";
-				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade);
+				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade,size);
 				if (rotate){
 					Command r1 = new Rotate(startT,endT,radian);
 					o.add(r1);
 				}
-				tempX += (int) (space * Math.cos(radian));
-				tempY += (int) (space * Math.sin(radian));
 			}
+			tempX += (int) (space * Math.cos(radian));
+			tempY += (int) (space * Math.sin(radian));
 		}
 	}
 	
@@ -74,11 +74,11 @@ public class TextDisplay extends Effects{
 			if (ch != ' '){
 				String s = ""+ch;
 				// use Unicode for the font name if the char is not supported in windows or Japanese character
-				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch)){
+				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch) || Character.isUpperCase(ch)){
 					s = OsuUtils.characterToUnicode(ch);
 				} 
 				String filePath = path + s + ".png";
-				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade);
+				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade, size);
 				if (radians.length == text.length()){
 					Command r1 = new Rotate(startT,endT,radians[i]);
 					o.add(r1);
@@ -91,7 +91,7 @@ public class TextDisplay extends Effects{
 	
 
 	
-	private VisualObject createCharacter(String filePath, int easing, long startT, long endT, int x, int y, double startFade,double endFade){
+	private VisualObject createCharacter(String filePath, int easing, long startT, long endT, int x, int y, double startFade,double endFade,double size){
 		VisualObject o = new Sprite(Layer.Foreground, filePath, x, y);
 		long t2 =0,t3=0;
 		if (startT + 2*fadeDuration <= endT){
@@ -103,10 +103,12 @@ public class TextDisplay extends Effects{
 		}
 		Command s1 = new VectorScale(startT,endT,size,size);
 		o.add(s1);
-		Command f1 = new Fade(Easing.QuintIn ,startT,t2,startFade,endFade);
+		Command f1 = new Fade(Easing.QuintIn ,startT,t2,startFade,1);
 		o.add(f1);
-		Command f2 = new Fade(Easing.QuintOut,t3,endT,startFade,endFade);
+		Command f2 = new Fade(t2,t3);
 		o.add(f2);
+		Command f3 = new Fade(Easing.QuintOut,t3,endT,1,endFade);
+		o.add(f3);
 		add(o);
 		return o;
 	}
