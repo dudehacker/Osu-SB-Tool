@@ -19,3 +19,6 @@ mp3 -> osb
 
 ### Lyrics Effect
 ![alt tag](https://osu.ppy.sh/ss/6142485)
+
+### Automatic BPM Display and BG transitions
+![alt tag](https://osu.ppy.sh/ss/6203420)
