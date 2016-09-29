@@ -24,9 +24,9 @@ public class WaterDrop extends Effects{
 	 * @param startT Start Time
 	 * @param endT End Time
 	 */
-	public WaterDrop(long startT, long endT){
+	public WaterDrop(CoordinateType coord,long startT, long endT){
 		super();
-		createEffect(easing,startT,endT,startSize,endSize,startFade,endFade);
+		createEffect(coord,easing,startT,endT,startSize,endSize,startFade,endFade);
 	}
 	
 /**
@@ -35,9 +35,9 @@ public class WaterDrop extends Effects{
  * @param endT End Time
  * @param c Color
  */
-	public WaterDrop(long startT, long endT, Color c){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color c){
 		super();
-		VisualObject object = createEffect(easing,startT,endT,startSize,endSize,startFade,endFade);
+		VisualObject object = createEffect(coord,easing,startT,endT,startSize,endSize,startFade,endFade);
 		Command c1 = new ColorCMD(startT,endT,c);
 		object.add(c1);
 	}
@@ -49,10 +49,10 @@ public class WaterDrop extends Effects{
 	 * @param c Color
 	 * @param n number of rings
 	 */
-	public WaterDrop(long startT, long endT, Color c, int n){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color c, int n){
 		super();
 		for (int i = 0; i< n ; i++){
-			VisualObject object = createEffect(easing,startT+timeDelay*i,endT+timeDelay*i,x,y,startSize,endSize,startFade,endFade);
+			VisualObject object = createEffect(coord,easing,startT+timeDelay*i,endT+timeDelay*i,x,y,startSize,endSize,startFade,endFade);
 			Command c1 = new ColorCMD(startT,endT,c);
 			object.add(c1);
 		}
@@ -68,10 +68,10 @@ public class WaterDrop extends Effects{
 	 * @param x X position for center of all rings
 	 * @param y Y position for center of all rings
 	 */
-	public WaterDrop(long startT, long endT, Color c, int n, int x, int y){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color c, int n, int x, int y){
 		super();
 		for (int i = 0; i< n ; i++){
-			VisualObject object = createEffect(easing,startT+timeDelay*i,endT+timeDelay*i,x,y,startSize,endSize,startFade,endFade);
+			VisualObject object = createEffect(coord,easing,startT+timeDelay*i,endT+timeDelay*i,x,y,startSize,endSize,startFade,endFade);
 			Command c1 = new ColorCMD(startT,endT,c);
 			object.add(c1);
 		}
@@ -85,12 +85,12 @@ public class WaterDrop extends Effects{
 	 * @param colors Array of colors , 1 color per ring
 	 * @param n Number of rings
 	 */
-	public WaterDrop(long startT, long endT, Color[] colors, int n){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color[] colors, int n){
 		super();
 		if ( colors.length == n){
 			for (Color c : colors){
 				for (int i = 0; i< n ; i++){
-					VisualObject object = createEffect(easing,startT+timeDelay*i,endT+timeDelay*i,startSize,endSize,startFade,endFade);
+					VisualObject object = createEffect(coord,easing,startT+timeDelay*i,endT+timeDelay*i,startSize,endSize,startFade,endFade);
 					Command c1 = new ColorCMD(startT,endT,c);
 					object.add(c1);
 				}
@@ -109,9 +109,9 @@ public class WaterDrop extends Effects{
 	 * @param startSize Start Size
 	 * @param endSize End Size
 	 */
-	public WaterDrop(long startT, long endT, Color c, double startSize, double endSize){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color c, double startSize, double endSize){
 		super();
-		VisualObject object = createEffect(easing,startT,endT,startSize,endSize,startFade,endFade);
+		VisualObject object = createEffect(coord,easing,startT,endT,startSize,endSize,startFade,endFade);
 		Command c1 = new ColorCMD(startT,endT,c);
 		object.add(c1);
 	}
@@ -126,16 +126,16 @@ public class WaterDrop extends Effects{
 	 * @param startFade Start Fade
 	 * @param endFade End Fade
 	 */
-	public WaterDrop(long startT, long endT, Color c, double startSize, double endSize, double startFade, double endFade){
+	public WaterDrop(CoordinateType coord,long startT, long endT, Color c, double startSize, double endSize, double startFade, double endFade){
 		super();
-		VisualObject object = createEffect(easing,startT,endT,startSize,endSize,startFade,endFade);
+		VisualObject object = createEffect(coord,easing,startT,endT,startSize,endSize,startFade,endFade);
 		Command c1 = new ColorCMD(startT,endT,c);
 		object.add(c1);
 	}
 	
 	
-	private VisualObject createEffect(int easing, long startT, long endT, double startSize, double endSize, double startFade,double endFade){
-		VisualObject o = new Sprite(Layer.Background, EffectsConstants.ring, x, y);
+	private VisualObject createEffect(CoordinateType c, int easing, long startT, long endT, double startSize, double endSize, double startFade,double endFade){
+		VisualObject o = new Sprite(c,Layer.Background, EffectsConstants.ring, x, y);
 		Command c1 = new VectorScale(easing,startT,endT,startSize,endSize);
 		Command c2 = new Fade(startT,endT,startFade,endFade);
 		o.add(c1);
@@ -144,8 +144,8 @@ public class WaterDrop extends Effects{
 		return o;
 	}
 	
-	private VisualObject createEffect(int easing, long startT, long endT,int x, int y, double startSize, double endSize, double startFade,double endFade){
-		VisualObject o = new Sprite(Layer.Background, EffectsConstants.ring, x, y);
+	private VisualObject createEffect(CoordinateType coord,int easing, long startT, long endT,int x, int y, double startSize, double endSize, double startFade,double endFade){
+		VisualObject o = new Sprite(coord,Layer.Background, EffectsConstants.ring, x, y);
 		Command c1 = new VectorScale(easing,startT,endT,startSize,endSize);
 		Command c2 = new Fade(startT,endT,startFade,endFade);
 		o.add(c1);

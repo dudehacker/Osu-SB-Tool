@@ -50,9 +50,8 @@ public class Rotate extends Command{
 	 */
 	@Override
 	public String toString() {
-		String f = OsuUtils.format;
-		String s = String.format(f,startR);
-		String e = String.format(f,endR);
+		String s = OsuUtils.formatDoubleToString(startR);
+		String e = OsuUtils.formatDoubleToString(endR);
 		if (s.equals(e)){
 			return " R,"+easing+","+startTime+","+endTime+","+s;
 		}

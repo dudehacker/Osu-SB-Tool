@@ -76,6 +76,10 @@ public class Timing {
 	};
 
 	
+	public int getBPM(){
+		return (int) (60000/mspb);
+	}
+	
 	public Timing clone(){
 		Timing t = new Timing(offset, mspb, meter, sampleSet, setID, volume, inherited, kiai);
 		return t;

@@ -1,12 +1,15 @@
 package Utils;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
@@ -15,7 +18,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.ImageInputStream;
 
 public class OsuUtils {
 	
@@ -25,6 +31,54 @@ public class OsuUtils {
 	private static int SUPPORTED_OSU_FILE_VERSION=14;
 	private static int SUPPORTED_PLAY_MODE = 3; // Osu!mania only
 	public final static String defaultOsuPath = "C:/Program Files (x86)/osu!/Songs";
+	public final static String startPath = System.getProperty("user.dir");
+	public static String getFileSuffix(final String path) {
+	    String result = null;
+	    if (path != null) {
+	        result = "";
+	        if (path.lastIndexOf('.') != -1) {
+	            result = path.substring(path.lastIndexOf('.'));
+	            if (result.startsWith(".")) {
+	                result = result.substring(1);
+	            }
+	        }
+	    }
+	    return result;
+	}
+	
+	public static String formatDoubleToString(double n){
+		String s = String.format(format,n);
+		while (s.charAt(s.length()-1) == '0'){
+			s = s.substring(0, s.length()-1);
+		}
+		if (s.charAt(s.length()-1) == '.'){
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+	
+	public static Dimension getImageDim(final String path) {
+	    Dimension result = null;
+	    String suffix = getFileSuffix(path);
+	    Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(suffix);
+	    if (iter.hasNext()) {
+	        ImageReader reader = iter.next();
+	        try {
+	            ImageInputStream stream = new FileImageInputStream(new File(path));
+	            reader.setInput(stream);
+	            int width = reader.getWidth(reader.getMinIndex());
+	            int height = reader.getHeight(reader.getMinIndex());
+	            result = new Dimension(width, height);
+	        } catch (IOException e) {
+	           
+	        } finally {
+	            reader.dispose();
+	        }
+	    } else {
+
+	    }
+	    return result;
+	}
 	
 	public static String convertALtoString(ArrayList<?> al){
 		String output="";
@@ -69,6 +123,15 @@ public class OsuUtils {
 		}
 		
 	    return true;
+	}
+	
+	public static String getCharFileName(char ch){
+		String s = ""+ch;
+		// use Unicode for the font name if the char is not supported in windows or Japanese character
+		if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch) || Character.isUpperCase(ch)){
+			s = OsuUtils.characterToUnicode(ch);
+		} 
+		return s;
 	}
 	
 	public static ArrayList<Long> getDistinctStartTime(ArrayList<HitObject> hitObjects, ArrayList<HitObject> hitObjects2 ){
@@ -208,10 +271,10 @@ public class OsuUtils {
 	}
 	
 	
-	public static File getOsuFile(){
+	public static File getOsuFile(String path){
 		File f = null;
 		FileFilter filter = new FileNameExtensionFilter("OSU file", "osu");
- 	   	final JFileChooser jFileChooser1 = new javax.swing.JFileChooser(defaultOsuPath);
+ 	   	final JFileChooser jFileChooser1 = new javax.swing.JFileChooser(path);
         jFileChooser1.addChoosableFileFilter(filter);
         jFileChooser1.setFileFilter(filter);
         // Open details
@@ -226,6 +289,78 @@ public class OsuUtils {
      	   f = jFileChooser1.getSelectedFile();
         }
 		return f;
+	}
+	
+	/**
+	 * 
+	 * @param a 
+	 * @param b
+	 * @param c
+	 * @return the 2 roots, 0 = small root, 1 = big root
+	 */
+	public static double[] quadraticFormula(double a, double b, double c){
+		double d = b*b -4 * a * c;
+		if (d < 0){
+			   System.out.println("Discriminant < 0, no real solutions" );
+			   System.out.println("b^2 = " + Math.pow(b,2));
+			   System.out.println("4ac = " + 4*a*c);
+			}
+		double[] output = new double[2];
+		output[1] = (-b + Math.sqrt(Math.pow(b,2)-(4*a*c)))/(2*a);
+		output[0] = (-b - Math.sqrt(Math.pow(b,2)-(4*a*c)))/(2*a);
+		return output;
+	}
+	
+	public static ArrayList<Timing> getKiaiStartTiming(File f) throws Exception{
+		ArrayList<Timing> output = new ArrayList<Timing>();
+		if (f == null || !(f.exists())){
+			// error reading file
+		}
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
+		    String line;
+		    int sectionID =0;
+		    while ((line = br.readLine()) != null) {      
+		       // read line by line
+		    	switch(sectionID){
+				case 0:
+					// General stuff
+					
+					if (line.equals("[TimingPoints]")){
+						sectionID=1;
+					} 
+					break;
+				case 1:
+					// timing points
+					if (line.contains("[HitObjects]") || line.contains("[Colours]") ){
+						sectionID=2;
+					} 
+					else if (!line.equals("")){
+						String[] parts = line.split(",");
+						if (parts[0].contains(".")){
+							parts[0] = parts[0].substring(0,parts[0].indexOf('.'));
+						}
+						if (parts[7].equals("1")){
+							long offset = Long.parseLong(parts[0]);
+							float mspb = Float.parseFloat(parts[1]);
+							int meter = Integer.parseInt(parts[2]);
+							int sampleSet = Integer.parseInt(parts[3]);
+							int setID = Integer.parseInt(parts[4]);
+							int volume = Integer.parseInt(parts[5]);
+							int isInherited = Integer.parseInt(parts[6]);
+							int isKiai = Integer.parseInt(parts[7]);
+							Timing timing = new Timing(offset,mspb,meter,sampleSet,setID,volume,isInherited,isKiai);
+							output.add(timing);
+						}
+						
+					}
+					 
+					break;
+					
+		    	}
+		    }
+		}
+
+		return output;
 	}
 	
 	public static ArrayList<Timing> getRedTimingPoints(File f) throws Exception{
@@ -244,41 +379,26 @@ public class OsuUtils {
 					
 					if (line.equals("[TimingPoints]")){
 						sectionID=1;
-					} else if (line.contains("osu file format v")){
-						int version = Integer.parseInt(line.substring(17));
-						if (version!=SUPPORTED_OSU_FILE_VERSION){
-							String errMsg = "The currently supported osu file version is "+SUPPORTED_OSU_FILE_VERSION +nl;
-							JOptionPane.showMessageDialog(null, errMsg);
-							System.exit(-1);
-						}
-					}
-					else if (line.contains("Mode:")){
-						int mode = Integer.parseInt(line.substring(6));
-						if (mode!=SUPPORTED_PLAY_MODE){
-							String errMsg = "The currently supported mode is mania";
-							JOptionPane.showMessageDialog(null, errMsg);
-							System.exit(-1);            
-						}
 					} 
 					break;
 				case 1:
 					// timing points
-					if (line.contains("[HitObjects]") ){
+					if (line.contains("[HitObjects]") || line.contains("[Colours]") ){
 						sectionID=2;
-					} else if (!line.equals("")){
+					} 
+					else if (!line.equals("")){
 						String[] parts = line.split(",");
 						if (parts[0].contains(".")){
 							parts[0] = parts[0].substring(0,parts[0].indexOf('.'));
 						}
-						int isInherited = Integer.parseInt(parts[6]);
-						if (isInherited == 1){
+						if (!parts[1].contains("-")){
 							long offset = Long.parseLong(parts[0]);
 							float mspb = Float.parseFloat(parts[1]);
 							int meter = Integer.parseInt(parts[2]);
 							int sampleSet = Integer.parseInt(parts[3]);
 							int setID = Integer.parseInt(parts[4]);
 							int volume = Integer.parseInt(parts[5]);
-
+							int isInherited = Integer.parseInt(parts[6]);
 							int isKiai = Integer.parseInt(parts[7]);
 							Timing timing = new Timing(offset,mspb,meter,sampleSet,setID,volume,isInherited,isKiai);
 							output.add(timing);
@@ -330,7 +450,7 @@ public class OsuUtils {
 					break;
 				case 1:
 					// timing points
-					if (line.contains("[HitObjects]") ){
+					if (line.contains("[HitObjects]") || line.contains("[Colours]") ){
 						sectionID=2;
 					} else if (!line.equals("")){
 						String[] parts = line.split(",");

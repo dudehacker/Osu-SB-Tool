@@ -52,15 +52,17 @@ public class VectorScale extends Command {
 
 	@Override
 	public String toString() {
-		String f = OsuUtils.format;
-		String startX = String.format(f,startScaleX);
-		String endX = String.format(f,endScaleX);
-		String startY = String.format(f,startScaleY);
-		String endY = String.format(f,endScaleY);
-		String y = String.format(f,endScaleY-startScaleY);
-		String x = String.format(f,endScaleX-startScaleX); 
+		String startX = OsuUtils.formatDoubleToString(startScaleX);
+		String endX = OsuUtils.formatDoubleToString(endScaleX);
+		String startY = OsuUtils.formatDoubleToString(startScaleY);
+		String endY = OsuUtils.formatDoubleToString(endScaleY);
+		String y = OsuUtils.formatDoubleToString(endScaleY-startScaleY);
+		String x = OsuUtils.formatDoubleToString(endScaleX-startScaleX); 
 		if (x.equals(y)){
 			if (startX.equals(endX)){
+				if (startX.equals("1")){
+					return "";
+				}
 				return " S,"+easing+","+startTime+","+endTime+","+startX;
 			}
 			return " S,"+easing+","+startTime+","+endTime+","+startX+","+endX;

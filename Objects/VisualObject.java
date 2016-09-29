@@ -1,8 +1,8 @@
 package Objects;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import Commands.Command;
+import Commands.*;
 import Utils.OsuUtils;
 
 
@@ -20,23 +20,41 @@ public abstract class VisualObject {
 	protected int x; 
 	protected int y;
 	protected ArrayList<Command> commands;
+	protected CoordinateType coordinate;
 	
-	public VisualObject(ObjectType type, Layer layer, String filePath , int x , int y){
-		initializeParameters(type, layer,Origin.Centre, filePath , x ,y);
+	public VisualObject(ObjectType type, Layer layer, String filePath){
+		this.type = type;
+		this.layer = layer;
+		this.filepath = filePath;
+		commands = null;
 	}
 	
-	public VisualObject(ObjectType type, Layer layer,Origin origin, String filePath , int x , int y){
-		initializeParameters(type, layer,origin, filePath , x ,y);
+	public VisualObject(CoordinateType c, ObjectType type, Layer layer, String filePath , int x , int y){
+		initializeParameters(c, type, layer,Origin.Centre, filePath , x ,y);
 	}
 	
-	private void initializeParameters(ObjectType type, Layer layer,Origin origin, String filePath , int x , int y){
-		this.x = OsuUtils.hitObjectXToStoryboardX(x);
-		this.y = OsuUtils.hitObjectYToStoryboardY(y);
+	public VisualObject(CoordinateType c, ObjectType type, Layer layer,Origin origin, String filePath , int x , int y){
+		initializeParameters(c, type, layer,origin, filePath , x ,y);
+	}
+	
+	private void initializeParameters(CoordinateType c, ObjectType type, Layer layer,Origin origin, String filePath , int x , int y){
 		this.type = type;
 		this.setLayer(layer);
 		this.origin = origin;
 		this.filepath = filePath;
+		coordinate = c;
+		if (isSBCoordinate()){
+			this.x = x;
+			this.y = y;
+		} else {
+			this.x = OsuUtils.hitObjectXToStoryboardX(x);
+			this.y = OsuUtils.hitObjectYToStoryboardY(y);
+		}
 		commands = new ArrayList<>();
+	}
+	
+	public boolean isSBCoordinate(){
+		return coordinate == CoordinateType.Storyboard;
 	}
 	
 	public void add(Command c){
@@ -90,10 +108,32 @@ public abstract class VisualObject {
 		return type.equals(ObjectType.Sprite);
 	}
 	
+	/**
+	 * 
+	 * @param type Direction of movement
+	 * @param startT End Time
+	 * @param endT Start Time
+	 * @param distance in SB coordinate
+	 */
+	public void addMove (MoveTypes type, long startT, long endT, int distance){
+		switch(type){
+		case Upward:
+			Move m = new Move(startT,endT,x,y+distance/2,x,y-distance/2);
+			add(m);
+			break;
+			
+		default:
+			System.out.println("undefined movement!");
+			System.exit(-1);
+			
+		}
+	}
+	
 	public String toString(){
 		sortByStartTime();
 		String output = getHeader() + nl;
 		for (Command c: commands){
+			if (!c.toString().equals(""))
 			output += c.toString() + nl;
 		}
 		return output;
@@ -126,6 +166,17 @@ public abstract class VisualObject {
 
 	public void setLayer(Layer layer) {
 		this.layer = layer;
+	}
+
+	public void removeAll(CommandName name) {
+		ArrayList<Command> newCommands = new ArrayList<>();
+		for (Command c : commands){
+			if (!c.getName().equals(name)){
+				newCommands.add(c.clone());
+			}
+		}
+		commands = newCommands;
+		
 	}
 }
 

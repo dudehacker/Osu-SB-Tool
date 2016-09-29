@@ -1,58 +1,146 @@
 package effects.customEffects;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.io.File;
+
 import Commands.*;
 import Objects.*;
 import Utils.*;
 import effects.*;
 
 /**
+ * Font name needs to be same as character name 
+ * Except the following characters need to be named using unicode value:
+ * 1. Capital letters
+ * 2. Character not supported in filename like / \ * etc
+ * 3. Character with unicode value > 266B
  * 
  * @author DH
  *
  */
 public class TextDisplay extends Effects{
 	private String path = EffectsConstants.textPath;
-	private int space = EffectsConstants.space;
+	private int space = EffectsConstants.spaceBetween2Image;
+	private int spaceWidth = EffectsConstants.spaceCharacterWidth;
 	private double startFade = EffectsConstants.fade;
 	private double endFade = 0;
 	private long fadeDuration = 1000;
 	
 	// need testing for size
-	private double size = 1;
+	private double size = 0.2 ;
+	private double ImagetoSBSize = 0.2;
 	
-	/**
-	 * 
-	 * @param text Text to display
-	 * @param startT Start Time
-	 * @param endT End Time
-	 * @param x X position of first character
-	 * @param y Y position of first character
-	 * @param size Size of text
-	 * @param degrees the angle between the text and X-axis in degrees
-	 */
-	public TextDisplay(String text, long startT, long endT, int x, int y, double size, double degrees, boolean rotate){
-		int tempX = x, tempY = y;
+/**
+ * 
+ * @param c Coordinate Type
+ * @param osuFile Osu File
+ * @param text Text to display
+ * @param startT Start Time
+ * @param endT End Time
+ * @param x X position
+ * @param y Y position
+ * @param degrees Degrees of text with respect to X-axis
+ * @param rotate Rotate the each character of the text
+ */
+	public TextDisplay(CoordinateType c , File osuFile, String text, long startT, long endT, int x, int y, double degrees, boolean rotate){
+		if (c.equals(CoordinateType.HitObject)){
+			x = OsuUtils.hitObjectXToStoryboardX(x);
+			y = OsuUtils.hitObjectYToStoryboardY(y);
+		}
 		double radian = OsuUtils.degreesToRadian(degrees);
-		for (int i =0; i<text.length();i++){
-			char ch = text.charAt(i);
-			// create the Visual Object for this character if it is not a space
-			if (ch != ' '){
-				String s = ""+ch;
-				// use Unicode for the font name if the char is not supported in windows or Japanese character
-				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch) || Character.isUpperCase(ch)){
-					s = OsuUtils.characterToUnicode(ch);
-				} 
-				String filePath = path + s + ".png";
-				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade,size);
+		String[] paths = getAllFilePath(text);
+		Dimension[] allXY = calculateAllXY(osuFile.getParent(), text, x, y , ImagetoSBSize, radian);
+		for (int i = 0; i < text.length(); i++){
+			String filePath = paths[i];
+			if (!filePath.equals("null")){
+				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,allXY[i].width,allXY[i].height,startFade,endFade,size);
 				if (rotate){
 					Command r1 = new Rotate(startT,endT,radian);
 					o.add(r1);
 				}
 			}
-			tempX += (int) (space * Math.cos(radian));
-			tempY += (int) (space * Math.sin(radian));
 		}
 	}
+	
+	public TextDisplay(CoordinateType c , File osuFile, String text, long startT, long endT, int x, int y,double size, double degrees, boolean rotate){
+		if (c.equals(CoordinateType.HitObject)){
+			x = OsuUtils.hitObjectXToStoryboardX(x);
+			y = OsuUtils.hitObjectYToStoryboardY(y);
+		}
+		double radian = OsuUtils.degreesToRadian(degrees);
+		String[] paths = getAllFilePath(text);
+		Dimension[] allXY = calculateAllXY(osuFile.getParent(), text, x, y , size, radian);
+		for (int i = 0; i < text.length(); i++){
+			String filePath = paths[i];
+			if (!filePath.equals("null")){
+				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,allXY[i].width,allXY[i].height,startFade,endFade,size);
+				if (rotate){
+					Command r1 = new Rotate(startT,endT,radian);
+					o.add(r1);
+				}
+			}
+		}
+	}
+	
+	
+	private Dimension[] calculateAllXY(String parentFolder, String text, int startX, int startY, double size, double angle){
+		int[] widths = getAllImageWidth(parentFolder,text);
+		Dimension[] output = new Dimension[widths.length];
+		output[0] = new Dimension(startX,startY);
+		double x1 = startX;
+		double y1 = startY;
+		//System.out.println("x1 = " + x1);
+		for (int i = 0; i < widths.length - 1; i ++){
+			int w1 = widths[i];
+			int w2 = widths[i+1];
+			
+			double p1x = x1 + size * Math.cos(angle)*w1; 
+			double p1y = y1 - size * Math.sin(angle)*w1; 	
+
+			double p2x = p1x + space * Math.cos(angle);
+			double p2y = p1y - space * Math.sin(angle);
+			
+			int x2 = (int) (p2x + size*Math.cos(angle)*w2);
+			int y2 = (int) (p2y - size*Math.sin(angle)*w2);
+			
+			x1 = x2;
+			y1 = y2;
+			output[i+1] = new Dimension(x2,y2);
+		}
+		return output;
+	}
+	
+	private String[] getAllFilePath(String text){
+		String[] output = new String[text.length()];
+		for (int i =0; i<text.length();i++){
+			char ch = text.charAt(i);
+			if (ch == ' '){
+				output[i] = "null";
+			} else {
+				String s = OsuUtils.getCharFileName(ch);
+				output[i] =  path + s + ".png";;
+			}
+		}
+		return output;
+	}
+	
+	private int[] getAllImageWidth(String parentFolder, String text){
+		int[] output = new int[text.length()];
+		for (int i =0; i<text.length();i++){
+			char ch = text.charAt(i);
+			if (ch == ' '){
+				output[i] = spaceWidth;
+			} else {
+				String s = OsuUtils.getCharFileName(ch);
+				String completePath = parentFolder + "\\" + path + s + ".png";
+				output[i] = OsuUtils.getImageDim(completePath).width/2;
+			}
+		}
+		
+		return output;
+	}
+
 	
 	/**
 	 * 
@@ -65,34 +153,18 @@ public class TextDisplay extends Effects{
 	 * @param degrees
 	 * @param radians
 	 */
-	public TextDisplay(String text, long startT, long endT, int x, int y, double size, double degrees, double[] radians){
-		int tempX = x, tempY = y;
-		double radian = OsuUtils.degreesToRadian(degrees);
-		for (int i =0; i<text.length();i++){
-			char ch = text.charAt(i);
-			// create the Visual Object for this character if it is not a space
-			if (ch != ' '){
-				String s = ""+ch;
-				// use Unicode for the font name if the char is not supported in windows or Japanese character
-				if (ExceptionCharacters.contains(ch) || OsuUtils.isCharacterJapanese(ch) || Character.isUpperCase(ch)){
-					s = OsuUtils.characterToUnicode(ch);
-				} 
-				String filePath = path + s + ".png";
-				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,tempX,tempY,startFade,endFade, size);
-				if (radians.length == text.length()){
-					Command r1 = new Rotate(startT,endT,radians[i]);
-					o.add(r1);
-				}
-				tempX += (int) (space * Math.cos(radian));
-				tempY += (int) (space * Math.sin(radian));
-			}
+	public TextDisplay(CoordinateType c, String text, long startT, long endT, int x, int y, double size, double degrees, double[] radians){
+		if (c.equals(CoordinateType.HitObject)){
+			x = OsuUtils.hitObjectXToStoryboardX(x);
+			y = OsuUtils.hitObjectYToStoryboardY(y);
 		}
+		//TODO
 	}
 	
 
 	
-	private VisualObject createCharacter(String filePath, int easing, long startT, long endT, int x, int y, double startFade,double endFade,double size){
-		VisualObject o = new Sprite(Layer.Foreground, filePath, x, y);
+	private VisualObject createCharacter( String filePath, int easing, long startT, long endT, int x, int y, double startFade,double endFade,double size){
+		VisualObject o = new Sprite(CoordinateType.Storyboard, Layer.Foreground, filePath, x, y);
 		long t2 =0,t3=0;
 		if (startT + 2*fadeDuration <= endT){
 			t2 = startT+fadeDuration;

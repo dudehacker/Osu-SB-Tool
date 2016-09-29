@@ -1,5 +1,5 @@
 package Objects;
 
 public enum ObjectType {
-	Sprite, Animation
+	Sprite, Animation, Background
 }

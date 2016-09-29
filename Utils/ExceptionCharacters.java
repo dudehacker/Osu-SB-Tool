@@ -14,7 +14,8 @@ public enum ExceptionCharacters {
 	quote("0022"),
 	lessThan("003c"),
 	greaterThan("003e"),
-	pipe("007c");
+	pipe("007c"),
+	dot("002e");
 	
 	private String value;
 	

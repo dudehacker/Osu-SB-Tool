@@ -8,13 +8,13 @@ import Commands.Command;
 
 public class Sprite extends VisualObject{
 
-	public Sprite(Layer layer, String filePath, int x, int y) {
-		super(ObjectType.Sprite,layer, filePath, x, y);
+	public Sprite(CoordinateType c, Layer layer, String filePath, int x, int y) {
+		super(c, ObjectType.Sprite,layer, filePath, x, y);
 
 	}
 	
-	public Sprite(Layer layer, Origin origin, String filePath, int x, int y) {
-		super(ObjectType.Sprite,layer,origin,filePath, x, y);
+	public Sprite(CoordinateType c, Layer layer, Origin origin, String filePath, int x, int y) {
+		super(c,ObjectType.Sprite,layer,origin,filePath, x, y);
 
 	}
 
@@ -22,13 +22,17 @@ public class Sprite extends VisualObject{
 	@Override
 	public String getHeader() {
 		addQuotesToFilePath();
-		return type + "," + getLayer() + "," + origin  +"," + filepath + "," + getX() + "," + getY();
+		if (isSBCoordinate()){
+			return type + "," + getLayer() + "," + origin  +"," + filepath + "," + x + "," + y;
+		}
+		return type + "," + getLayer() + "," + origin  +"," + filepath + "," 
+		+ OsuUtils.hitObjectXToStoryboardX(x) + "," + OsuUtils.hitObjectYToStoryboardY(y);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Sprite Clone() {
-		Sprite s = new Sprite(getLayer(),origin,filepath, OsuUtils.storyboardXToHitObjectX(x),OsuUtils.storyboardYToHitObjectY(y));
+		Sprite s = new Sprite(coordinate,getLayer(),origin,filepath, x,y);
 		s.commands = (ArrayList<Command>) commands.clone();
 		return s;
 	}

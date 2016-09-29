@@ -45,9 +45,8 @@ public class Fade extends Command{
 
 	@Override
 	public String toString() {
-		String f = OsuUtils.format;
-		String s = String.format(f,getStartOpacity());
-		String e = String.format(f,getEndOpacity());
+		String s = OsuUtils.formatDoubleToString(getStartOpacity());
+		String e = OsuUtils.formatDoubleToString(getEndOpacity());
 		if (getStartOpacity() == getEndOpacity()){
 			return " F," + easing + "," +startTime + "," +endTime + ","+s;
 		}

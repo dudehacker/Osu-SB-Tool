@@ -3,6 +3,8 @@ package effects;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import Commands.Command;
+import Commands.CommandName;
 import Objects.VisualObject;
 
 
@@ -34,9 +36,27 @@ public class Effects {
 		update();
 	}
 	
+	public void add(Effects e){
+		for (VisualObject o : e.objects){
+			add(o);
+		}
+	}
+	
 	public void remove(VisualObject o){
 		getObjects().remove(o);
 		update();
+	}
+	
+	public void removeAll(CommandName name){
+		for (VisualObject o : objects){
+			o.removeAll(name);
+		}
+	}
+	
+	public void addAll(Command c){
+		for (VisualObject o : objects){
+			o.add(c.clone());
+		}
 	}
 	
 	private void update() {
