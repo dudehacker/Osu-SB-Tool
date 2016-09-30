@@ -1,23 +1,31 @@
 package Commands;
 
-public enum MoveTypes {
-	Upward(1),
-	Downward(2),
-	toLeft(3),
-	toRight(4),
-	toTopLeft(5),
-	toTopRight(6),
-	toBottomLeft(7),
-	toBottomRight(8)
-	;
+import java.util.Random;
+
+
+public class MoveTypes {
+	// Linear
+	public static final int Upward = 0;
+	public static final int Downward = 1;
+	public static final int toLeft = 2;
+	public static final int toRight=3;
+	public static final int toTopLeft = 4;
+	public static final int toTopRight = 5;
+	public static final int toBottomLeft = 6;
+	public static final int toBottomRight = 7;
 	
-	private int type;
+	// V shape
+	public static final int v_r = 8;
+	public static final int v_l = 9;
 	
-	MoveTypes(int type){
-		this.type = type;
+	// Half Circle
+	public static final int halfCircle_top_ccw = 10;
+	public static final int halfCircle_top_cw = 11;
+	
+	
+	public static int getRandom(){
+		Random r = new Random();
+		return r.nextInt(12);
 	}
 	
-	public int getType(){
-		return type;
-	}
 }

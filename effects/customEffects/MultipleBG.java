@@ -33,6 +33,56 @@ public class MultipleBG extends Effects{
 							    3,1,3,3,2,3,3,2,
 							    3,1,3,3,3,3,2,3}; 
 	private final int[] covers = {1,2,3,1,4,5,6,2,7,8,4,9,10,11,1,12,13,14,3,15,10,16,16,17};
+	private final int[] move = {
+			// 1. Mattete Ainouta - Aqours -> 01
+			MoveTypes.Upward,
+			// 2. Kaguya no Shiro de Odoritai - u's -> 02
+			MoveTypes.toTopRight,
+			// 3. Humming Friend - Aqours -> 03
+			MoveTypes.toTopRight,
+			// 4. Koi ni Naritai AQUARIUM - Aqours -> 01
+			MoveTypes.toRight,
+			// 5. Paradise Live - u's -> 4
+			MoveTypes.toBottomLeft,
+			// 6. Yume Kataruyori Yume Utaou - Aqours ->5
+			MoveTypes.v_r,
+			// 7. Yume no Tobira - u's ->6
+			MoveTypes.v_r,
+			// 8. Kitto Seishun ga Kikoeru - u's ->2
+			MoveTypes.toTopRight,
+			// 9. Music S.T.A.R.T - u's ->7
+			MoveTypes.toTopLeft,
+			// 10. Snow Halation - u's ->8
+			MoveTypes.v_r,
+			// 11. Takaramonozu - u's ->4
+			MoveTypes.v_r,
+			// 12. Sore wa Bokutachi no Kiseki - u's ->9
+			MoveTypes.v_l,
+			// 13. Kimi no Kokoro wa Kagayaiteru Kai? - Aqours ->10
+			MoveTypes.toTopRight,
+			// 14. COLORFUL VOICE - u's ->11
+			MoveTypes.toTopLeft,
+			// 15. Todokanai Hoshida to Shite mo - Aqours ->1
+			MoveTypes.toTopLeft,
+			// 16. Kira-Kira Sensation - u's ->12
+			MoveTypes.toBottomRight,
+			// 17. Bokura wa Ima no Naka de - u's ->13
+			MoveTypes.v_r,
+			// 18. No Brand Girls - u's ->14
+			MoveTypes.halfCircle_top_cw,
+			// 19. Aozora Jumping Heart - Aqours ->3
+			MoveTypes.toTopRight,
+			// 20. Bokura no LIVE Kimi to no LIFE - u's ->15
+			MoveTypes.toRight,
+			// 21. Aqours*HEROES - Aqours ->10
+			MoveTypes.toBottomLeft,
+			// 22. MOMENT RING - u's ->16
+			MoveTypes.toLeft,
+			// 23. Sayounara e Sayonara! - u's ->16
+			MoveTypes.toRight,
+			// 24. Aishiteru Banzai - u's ->17
+			MoveTypes.toBottomRight
+	};
 	private final double coverSize = 0.5;
 	private final long coverDuration = 1000;
 	private final int TitleBoxX = 600;
@@ -65,9 +115,9 @@ public class MultipleBG extends Effects{
 				}
 				String filePath = BGFolder + (i+1) + ".jpg";
 				double bgSize = size*1.2;
-				createBG(filePath, startTime, endTime,x,y,startFade,endFade,bgSize);
+				createBG(filePath, startTime, endTime,x,y,startFade,endFade,bgSize,move[i]);
 				String coverPath = coverFolder + (covers[i]) + ".jpg";
-				loadCover(coverPath,startTime,x,y,startFade,endFade,coverSize);
+				loadCover(coverPath,startTime-fadeDuration/2,x,y,startFade,endFade,coverSize);
 				String bpmBGPath = BPMFolder + "bpm.png";
 				CreateBPMDisplay(bpmBGPath,startTime, endTime,TitleBoxX,TitleBoxY,startFade,endFade,size);	
 				String bpmPath = BPMFolder + "bpm_"+songTypes[i] + ".png";
@@ -172,7 +222,7 @@ public class MultipleBG extends Effects{
 
 	
 	
-	private VisualObject createBG( String filePath, long startT, long endT, int x, int y, double startFade,double endFade,double size){
+	private VisualObject createBG( String filePath, long startT, long endT, int x, int y, double startFade,double endFade,double size, int move){
 		VisualObject o = new Sprite(CoordinateType.Storyboard, Layer.Background, filePath, x, y);
 		long t1=0,t2 =0,t3=0,t4=0;
 		if (startT + 2*fadeDuration <= endT){
@@ -192,7 +242,7 @@ public class MultipleBG extends Effects{
 		o.add(f2);
 		Command f3 = new Fade(Easing.QuintOut,t3,t4,1,endFade);
 		o.add(f3);
-		o.addMove(MoveTypes.Upward, startT, endT, distance);
+		o.addMove(move, startT, endT, distance);
 		add(o);
 		return o;
 	}

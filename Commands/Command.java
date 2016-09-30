@@ -21,7 +21,7 @@ public abstract class  Command {
 	
 	private void checkInputParameter(int easing, long  startT, long endT){
 		if (endT<startT){
-			throw new IllegalArgumentException("End time "+ endT+ " can't be greater than start time "+startT+"!");
+			throw new IllegalArgumentException("start time "+ startT+ " can't be greater than end time "+endT+"!");
 		}
 		
 		this.easing =easing;
