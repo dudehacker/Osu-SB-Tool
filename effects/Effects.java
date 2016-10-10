@@ -6,6 +6,7 @@ import java.util.Comparator;
 import Commands.Command;
 import Commands.CommandName;
 import Objects.VisualObject;
+import Utils.Sample;
 
 
 // Effects is multiple objects
@@ -13,6 +14,7 @@ public class Effects {
 	private long startTime=Long.MAX_VALUE;
 	private long endTime = Long.MIN_VALUE;
 	private ArrayList<VisualObject> objects = new ArrayList<>();
+	private ArrayList<Sample> samples = new ArrayList<>();
 	
 	
 	public long getStartTime(){
@@ -31,9 +33,18 @@ public class Effects {
 		getObjects().remove(index);
 	}
 	
+	public void add(Command c){
+		getObjects().get(0).add(c);
+		update();
+	}
+	
 	public void add(VisualObject o){
 		getObjects().add(o);
 		update();
+	}
+	
+	public void add(Sample s){
+		getSamples().add(s.clone());
 	}
 	
 	public void add(Effects e){
@@ -41,6 +52,7 @@ public class Effects {
 			add(o);
 		}
 	}
+	
 	
 	public void remove(VisualObject o){
 		getObjects().remove(o);
@@ -73,7 +85,7 @@ public class Effects {
 					e = endT;
 				}
 			}
-		startTime = s;
+		setStartTime(s);
 		endTime = e;
 		}
 		
@@ -82,8 +94,8 @@ public class Effects {
 	public static Comparator<Effects> StartTimeComparator = new Comparator<Effects>() {
 		@Override
 		public int compare(Effects e1, Effects e2) {
-			long t1 = e1.startTime;
-			long t2 = e2.startTime;
+			long t1 = e1.getStartTime();
+			long t2 = e2.getStartTime();
 			/* For ascending order */
 			return (int) (t1 - t2);
 		}
@@ -126,6 +138,18 @@ public class Effects {
 
 	public void setObjects(ArrayList<VisualObject> objects) {
 		this.objects = objects;
+	}
+
+	protected void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+	public ArrayList<Sample> getSamples() {
+		return samples;
+	}
+
+	public void setSamples(ArrayList<Sample> samples) {
+		this.samples = samples;
 	}
 	
 }

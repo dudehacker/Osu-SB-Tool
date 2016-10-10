@@ -19,8 +19,16 @@ public abstract class  Command {
 		checkInputParameter(0,startT,endT);
 	}
 	
+	public Command(CommandName n, long startT){
+		name =n;
+		checkInputParameter(-1,startT,-1);
+	}
+	
 	private void checkInputParameter(int easing, long  startT, long endT){
-		if (endT<startT){
+		if (endT<0 && easing < 0){
+			startTime = startT;
+		}
+		else if (endT<startT){
 			throw new IllegalArgumentException("start time "+ startT+ " can't be greater than end time "+endT+"!");
 		}
 		

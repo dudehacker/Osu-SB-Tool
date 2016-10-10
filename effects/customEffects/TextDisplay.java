@@ -164,7 +164,7 @@ public class TextDisplay extends Effects{
 
 	
 	private VisualObject createCharacter( String filePath, int easing, long startT, long endT, int x, int y, double startFade,double endFade,double size){
-		VisualObject o = new Sprite(CoordinateType.Storyboard, Layer.Foreground, filePath, x, y);
+		VisualObject o = new Sprite(CoordinateType.Storyboard, Layer.Background, filePath, x, y);
 		long t2 =0,t3=0;
 		if (startT + 2*fadeDuration <= endT){
 			t2 = startT+fadeDuration;

@@ -117,62 +117,138 @@ public abstract class VisualObject {
 	 * @param endT Start Time
 	 * @param distance in SB coordinate
 	 */
-	public void addMove (int type, long startT, long endT, int distance){
+	public void addMove (int type, long startT, long endT, int distance, boolean isFullScreenBG){
+		// max change in x, y
+		int dXmax = 0;
+		int dYmax = 0;
+		
+		// line
 		int dX = (int) (distance * Math.cos(Math.PI/4));
 		int dY = (int) (distance * Math.sin(Math.PI/4));
 		long dt = (endT-startT)/2;
 		// v shape
 		int dX2 = (int) (distance/Math.sqrt(20));
 		int dY2 = (int) (2*distance/Math.sqrt(20));
-
+		
 		switch(type){
-		case MoveTypes.Upward:
+		case CameraMove.Upward:
 			add(new Move(startT,endT,x,y-distance/2,x,y+distance/2));
+			dYmax = distance;
 			break;
-		case MoveTypes.Downward:
+		case CameraMove.Downward:
 			add(new Move(startT,endT,x,y+distance/2,x,y-distance/2));
+			dYmax = distance;
 			break;
-		case MoveTypes.toLeft:
+		case CameraMove.toLeft:
 			add(new Move(startT,endT,x-distance/2,y,x+distance/2,y));
+			dXmax = distance;
 			break;
-		case MoveTypes.toRight:
+		case CameraMove.toRight:
 			add(new Move(startT,endT,x+distance/2,y,x-distance/2,y));
+			dXmax = distance;
 			break;
-		case MoveTypes.toTopRight:
+		case CameraMove.toTopRight:
 			add(new Move(startT,endT,x+dX,y-dY,x-dX,y+dY));
+			dXmax = 2*dX;
+			dYmax = 2*dY;
 			break;
-		case MoveTypes.toTopLeft:
+		case CameraMove.toTopLeft:
 			add(new Move(startT,endT,x-dX,y-dY,x+dX,y+dY));
+			dXmax = 2*dX;
+			dYmax = 2*dY;
 			break;
-		case MoveTypes.toBottomLeft:
+		case CameraMove.toBottomLeft:
 			add(new Move(startT,endT,x-dX,y+dY,x+dX,y-dY));
+			dXmax = 2*dX;
+			dYmax = 2*dY;
 			break;
-		case MoveTypes.toBottomRight:
+		case CameraMove.toBottomRight:
 			add(new Move(startT,endT,x+dX,y+dY,x-dX,y-dY));
+			dXmax = 2*dX;
+			dYmax = 2*dY;
 			break;
-		case MoveTypes.v_r:
+		case CameraMove.v_r:
 			add(new Move(startT,startT+dt,x-dX2,y-dY2/2,x,y+dY2/2));
-			add(new Move(startT+dt,endT,x,y+dY2/2,x+dX,y-dY2));
-			reflectMovementToOrigin();
+			add(new Move(startT+dt,endT,x,y+dY2/2,x+dX,y-dY2/2));
+			reflectMovementsToOrigin();
+			if (dX2>dX){
+				dXmax = 2* dX2;
+			} else {
+				dXmax = 2* dX;
+			}
+			dYmax = 2*dY2;
 			break;
-		case MoveTypes.v_l:
+			
+		case CameraMove.v_reversed_r:
+			add(new Move(startT,startT+dt,x-dX2,y-dY2/2,x,y+dY2/2));
+			add(new Move(startT+dt,endT,x,y+dY2/2,x+dX,y-dY2/2));
+			reflectMovementsToYAxis();
+			if (dX2>dX){
+				dXmax = 2* dX2;
+			} else {
+				dXmax = 2* dX;
+			}
+			dYmax = 2*dY2;
+			break;
+			
+		case CameraMove.v_l:
 			add(new Move(startT,startT+dt,x+dX,y-dY2,x,y+dY2/2));
 			add(new Move(startT+dt,endT,x,y+dY2/2,x-dX2,y-dY2/2));
-			reflectMovementToXAxis();
+			if (dX2>dX){
+				dXmax = 2* dX2;
+			} else {
+				dXmax = 2* dX;
+			}
+			dYmax = 2*dY2;
+			reflectMovementsToXAxis();
 			break;
-		case MoveTypes.halfCircle_top_ccw:
+			
+		case CameraMove.v_reversed_l:
+			add(new Move(startT,startT+dt,x-dX2,y-dY2/2,x,y+dY2/2));
+			add(new Move(startT+dt,endT,x,y+dY2/2,x+dX,y-dY2/2));
+			if (dX2>dX){
+				dXmax = 2* dX2;
+			} else {
+				dXmax = 2* dX;
+			}
+			dYmax = 2*dY2;
+			break;
+			
+		case CameraMove.halfCircle_top_ccw://give up
 			addHalfTopCircleCCW(startT,endT,distance);
 			break;
-		case MoveTypes.halfCircle_top_cw:
+		case CameraMove.halfCircle_top_cw: //give up
 			addHalfTopCircleCCW(startT,endT,distance);
 			//reflectMovementToYAxis();
 			break;
+
 		default:
 			System.out.println("undefined movement!");
-			System.exit(-1);
-			
+			System.exit(-1);	
 		}
-
+		double scale = 0;
+		if (isFullScreenBG){
+			if (dYmax > dXmax){
+				if (dYmax > 0){
+					scale =  (1.0*Yc*2 + dYmax)/(Yc*2);
+				}
+			} else {
+				if (dXmax > 0){
+					scale = (1.0*Xc*2 + dXmax)/(Xc*2);
+				}
+			}
+		VectorScale s1 = (VectorScale) getCommand(CommandName.VectorScale);
+		s1.setSize(scale*s1.getEndScaleX());
+		}
+	}
+	
+	public Command getCommand(CommandName name){
+		for (Command c : commands){
+			if (c.getName().equals(name)){
+				return c;
+			}
+		}
+		return null;
 	}
 	
 	private void addHalfTopCircleCCW(long startT, long endT, int distance){
@@ -190,14 +266,13 @@ public abstract class VisualObject {
 		}
 	}
 
-	public void reflectMovementToYAxis(){
+	public void reflectMovementsToYAxis(){
 		ArrayList<Command> newCommands = new ArrayList<>();
 		for (Command c : commands){
 			if (!(c instanceof Move)){
 				// backup other commands
 				newCommands.add(c.clone());
 			} else{
-				System.out.println("flipped to Y axis");
 				Move m = ((Move) c);
 				// create new move commands
 				newCommands.add(new Move(c.getEasing(),c.getStartTime(),c.getEndTime(),
@@ -209,14 +284,13 @@ public abstract class VisualObject {
 		commands = newCommands;
 	}
 	
-	public void reflectMovementToXAxis(){
+	public void reflectMovementsToXAxis(){
 		ArrayList<Command> newCommands = new ArrayList<>();
 		for (Command c : commands){
 			if (!(c instanceof Move)){
 				// backup other commands
 				newCommands.add(c.clone());
 			} else{
-				System.out.println("flipped to X axis");
 				Move m = ((Move) c);
 				// create new move commands
 				newCommands.add(new Move(c.getEasing(),c.getStartTime(),c.getEndTime(),
@@ -228,9 +302,18 @@ public abstract class VisualObject {
 		commands = newCommands;
 	}
 	
-	public void reflectMovementToOrigin(){
-		reflectMovementToXAxis();
-		reflectMovementToYAxis();
+	public void reflectMovementsToOrigin(){
+		reflectMovementsToXAxis();
+		reflectMovementsToYAxis();
+	}
+	
+	public void mirrorAllMovementsFrom(VisualObject source){
+		removeAll(CommandName.Move);
+		for (Command c : source.commands){
+			if (c instanceof Move){
+				add( c.clone());
+			}
+		}
 	}
 	
 	public String toString(){

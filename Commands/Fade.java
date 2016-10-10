@@ -13,16 +13,20 @@ public class Fade extends Command{
 		checkParameter(1, 1);
 	}
 	
-	public Fade(int easing, long startT, long endT, double startO, double endO) {
-		super(CommandName.Fade, easing, startT, endT);
-		checkParameter(startO, endO);
+	public Fade(long startT, long endT, double startO){
+		super(CommandName.Fade, startT, endT);
+		checkParameter(startO,startO);
 	}
 	
 	public Fade(long startT, long endT, double startO, double endO){
 		super(CommandName.Fade, startT, endT);
 		checkParameter(startO, endO);
 	}
-
+	
+	public Fade(int easing, long startT, long endT, double startO, double endO) {
+		super(CommandName.Fade, easing, startT, endT);
+		checkParameter(startO, endO);
+	}
 	private void checkParameter(double startO, double endO){
 		if (getStartOpacity() >1){
 			throw new IllegalArgumentException("Start Opacity can't be greater than 1");

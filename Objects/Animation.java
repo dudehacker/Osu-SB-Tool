@@ -7,18 +7,18 @@ import Commands.Command;
 
 
 public class Animation extends VisualObject{
-	private Loop loopType;
+	private LoopType loopType;
 	private int frameCount;
 	private int frameDelay;
 	
-	public Animation(CoordinateType c, Layer layer, String filePath, int x, int y, int frameCount, int frameDelay, Loop loopType) {
+	public Animation(CoordinateType c, Layer layer, String filePath, int x, int y, int frameCount, int frameDelay, LoopType loopType) {
 		super(c, ObjectType.Animation,layer, filePath, x, y);
 		this.loopType = loopType;
 		this.frameCount = frameCount;
 		this.frameDelay = frameDelay;
 	}
 
-	public Animation(CoordinateType c, Layer layer, Origin origin, String filePath, int x, int y, int frameCount, int frameDelay, Loop loopType) {
+	public Animation(CoordinateType c, Layer layer, Origin origin, String filePath, int x, int y, int frameCount, int frameDelay, LoopType loopType) {
 		super(c, ObjectType.Animation,layer,origin, filePath, x, y);
 		this.loopType = loopType;
 		this.frameCount = frameCount;

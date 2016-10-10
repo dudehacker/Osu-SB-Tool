@@ -22,6 +22,7 @@ public class Sample {
 	
 	@Override
 	public String toString(){
+		addQuotesToHS();
 		return "Sample,"+startTime+",0,"+hitSound+","+volume;
 	}
 	

@@ -3,6 +3,7 @@ package effects;
 public class EffectsConstants {
 	public final static String sbPath = "SB\\";
 	public final static String textPath = sbPath+"text\\";
+	public final static String charPopupPath = sbPath+"Cards\\";
 	public final static String  ring = sbPath + "ring.png";
 	public final static String flash = sbPath + "flash.png";
 	// center

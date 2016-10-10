@@ -5,5 +5,6 @@ public enum CommandName {
 	Fade,
 	VectorScale,
 	Rotate,
-	Color
+	Color, 
+	Loop
 }

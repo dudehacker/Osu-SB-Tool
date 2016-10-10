@@ -85,6 +85,14 @@ public class Timing {
 		return t;
 	}
 	
+	public boolean isKiai(){
+		return kiai==1;
+	}
+	
+	public boolean isInherited(){
+		return inherited==0;
+	}
+	
 	public String toString(){
 		return "" + offset + "," + mspb + "," + meter + "," + sampleSet +"," + setID + "," + volume + "," + inherited + "," + kiai;
 	}

@@ -14,41 +14,42 @@ import Utils.OsuUtils;
 public class TestMain {
 	public static void main(String[] args){
 		TestMain m = new TestMain();
-		
-		//m.testWaterDrop();
-		//m.testTextDisplay();
-		m.testBGs();
-		
-	}
-	
-	private void testBGs(){
 		Storyboard sb = new  Storyboard(false);
-		Effects e1 = new MultipleBG(sb.getOsuFile());
-		sb.add(e1);
-		System.out.println(sb.toString());
+		//m.testWaterDrop();
+
+		m.testBGs(sb);
+		m.testCharPopup(sb);
+		//m.testTextDisplay(sb);
 		sb.exportSB();
 	}
 	
-	private void testTextDisplay(){
+	
+	private void testCharPopup(Storyboard sb){
+		Effects charPopup = new CharacterPopUp(sb.getOsuFile());
+		sb.add(charPopup);
+		
+	}
+	
+	private void testBGs(Storyboard sb){
+		Effects e1 = new MultipleBG(sb.getOsuFile());
+		sb.add(e1);
+	}
+	
+	private void testTextDisplay(Storyboard sb){
 		String s = "1. ‘Ò‚Á‚Ä‚Äˆ¤‚Ì‚¤‚½ - Aqours";
 		
 		/*for (int i = 0; i<s.length();i++){
 			char ch = s.charAt(i);
 			System.out.println(""+ch+ "  =  " +OsuUtils.characterToUnicode(ch));
 		}*/
-		Storyboard sb = new  Storyboard(false);
 		Effects e1 = new TextDisplay(CoordinateType.HitObject, sb.getOsuFile(),s,3000, 10000,  0, 350, 45,false);
 		sb.add(e1);
-		System.out.println(sb.toString());
-		sb.exportSB();
 	}
 	
-	private void testWaterDrop(){
-		Storyboard sb = new  Storyboard(false);
+	private void testWaterDrop(Storyboard sb){
 		Effects e1 = new WaterDrop(CoordinateType.HitObject,3132,3677,Color.PINK, 4);
 		e1.setALLXY(124, 96);
 		sb.add(e1);
-		System.out.println(sb.toString());
 	}
 	
 }

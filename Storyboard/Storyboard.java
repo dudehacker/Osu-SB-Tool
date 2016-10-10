@@ -17,6 +17,7 @@ import effects.Effects;
 import Objects.Layer;
 import Objects.VisualObject;
 import Utils.OsuUtils;
+import Utils.Sample;
 
 // Size = 640x480
 public class Storyboard {
@@ -30,6 +31,7 @@ public class Storyboard {
 	private ArrayList<VisualObject> SB_fail = new ArrayList<>();
 	private ArrayList<VisualObject> SB_pass = new ArrayList<>();
 	private ArrayList<VisualObject> SB_foreground = new ArrayList<>();
+	private ArrayList<Sample> SB_Samples = new ArrayList<>();
 
 	public Storyboard(boolean isDifficultySpecific){
 		readFromProperty(OsuUtils.startPath);
@@ -119,7 +121,9 @@ private void writeToProperty(String path) {
 			} else if (o.getLayer() == Layer.Pass){
 				SB_pass.add(o.Clone());
 			}
-			
+		}
+		for (Sample s : e.getSamples()){
+			SB_Samples.add(s.clone());
 		}
 	}
 	
@@ -194,6 +198,7 @@ private void writeToProperty(String path) {
 		text+= "//Storyboard Layer 3 (Foreground)" + nl;
 		text += getLayerInfo(SB_foreground);
 		text+= "//Storyboard Sound Samples" + nl;
+		text += OsuUtils.convertALtoString(SB_Samples);
 		return text;
 	}
 	

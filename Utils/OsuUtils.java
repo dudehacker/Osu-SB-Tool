@@ -70,7 +70,7 @@ public class OsuUtils {
 	            int height = reader.getHeight(reader.getMinIndex());
 	            result = new Dimension(width, height);
 	        } catch (IOException e) {
-	           
+	        	System.out.println(path);
 	        } finally {
 	            reader.dispose();
 	        }
@@ -311,55 +311,114 @@ public class OsuUtils {
 		return output;
 	}
 	
-	public static ArrayList<Timing> getKiaiStartTiming(File f) throws Exception{
-		ArrayList<Timing> output = new ArrayList<Timing>();
+	public static double getImageToSBSize(String fullBGPath){
+		double safetyRange = 1.1;
+		double verticalScale = 480.0/OsuUtils.getImageDim(fullBGPath).getHeight() * safetyRange;
+			return verticalScale;
+	}
+	
+	public static long[] getLastNoteTimingOfEachSection(File f) throws Exception{
+		ArrayList<Timing> redTiming = OsuUtils.getRedTimingPoints(f);
+		int i = 0;
+	    ArrayList<Long> temp = new ArrayList<>();
+		long[] output = new long[redTiming.size()];
 		if (f == null || !(f.exists())){
 			// error reading file
 		}
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
 		    String line;
 		    int sectionID =0;
+		    long localMax = 0;
 		    while ((line = br.readLine()) != null) {      
 		       // read line by line
 		    	switch(sectionID){
 				case 0:
-					// General stuff
-					
-					if (line.equals("[TimingPoints]")){
+					// General stuff	
+					if (line.contains("[HitObjects]")){
 						sectionID=1;
 					} 
 					break;
 				case 1:
-					// timing points
-					if (line.contains("[HitObjects]") || line.contains("[Colours]") ){
-						sectionID=2;
-					} 
-					else if (!line.equals("")){
-						String[] parts = line.split(",");
-						if (parts[0].contains(".")){
-							parts[0] = parts[0].substring(0,parts[0].indexOf('.'));
-						}
-						if (parts[7].equals("1")){
-							long offset = Long.parseLong(parts[0]);
-							float mspb = Float.parseFloat(parts[1]);
-							int meter = Integer.parseInt(parts[2]);
-							int sampleSet = Integer.parseInt(parts[3]);
-							int setID = Integer.parseInt(parts[4]);
-							int volume = Integer.parseInt(parts[5]);
-							int isInherited = Integer.parseInt(parts[6]);
-							int isKiai = Integer.parseInt(parts[7]);
-							Timing timing = new Timing(offset,mspb,meter,sampleSet,setID,volume,isInherited,isKiai);
-							output.add(timing);
+					// Hit OBject
+					if (line!=null && line.contains(",")){
+						String[] parts = line.split(Pattern.quote(","));
+						long t = Long.parseLong(parts[2]);
+						if (i==redTiming.size()-1){
+							temp.add(t);
+						} else {
+							if (t>=redTiming.get(i).getOffset() && t<redTiming.get(i+1).getOffset()){
+								if (t>localMax){
+									localMax = t;
+								}
+							} else {
+								output[i] = localMax;
+								localMax = t;
+								i++;
+							}
 						}
 						
-					}
-					 
+					
+					} 
 					break;
 					
-		    	}
+				}
 		    }
 		}
+		output[output.length-1] = temp.get(temp.size()-1);
+		return output;
+	}
+	
+	public static ArrayList<Timing> getFirstKiaiOfEachRedTiming(File f) throws Exception{
+		ArrayList<Timing> output = new ArrayList<Timing>();
+		ArrayList<Timing> allTimings = getTimingPoints(f);
+		boolean kiai = false;
+		for (Timing t : allTimings){
+			if (!t.isInherited()){
+				kiai = true;
+			} else{
+				if (t.isKiai() && kiai){
+					output.add(t.clone());
+					kiai=false;
+				}
+			}
+		}
+		return output;
+	}
+	
+	public static ArrayList<Timing> getFirstKiaiStartTiming(File f) throws Exception{
+		ArrayList<Timing> output = new ArrayList<Timing>();
+		ArrayList<Timing> redTimings = getRedTimingPoints(f);
+		ArrayList<Timing> allKiai = getKiaiStartTiming(f);
+		ArrayList<Integer> indexList = new ArrayList<>();
+		for (Timing t : allKiai){
+			Integer index = getSongIndex(redTimings,t.getOffset());
+			if (!indexList.contains(index)){
+				output.add(t);
+				indexList.add(index);
+			}
+			
+		}
 
+		
+		return output;
+	}
+	
+	public static ArrayList<Timing> getKiaiStartTiming(File f) throws Exception{
+		ArrayList<Timing> output = new ArrayList<Timing>();
+		ArrayList<Timing> allTimings = getTimingPoints(f);
+		Timing previousTiming = null;;
+		for (Timing t : allTimings){
+			if (previousTiming == null){
+				if (t.isKiai()){
+					output.add(t.clone());
+				}
+			} else {
+				if (!previousTiming.isKiai() && t.isKiai()){
+					output.add(t.clone());
+				}
+			}
+			previousTiming = t.clone();
+		}
 		return output;
 	}
 	
@@ -415,6 +474,22 @@ public class OsuUtils {
 		return output;
 	}
 	
+	public static int getSongIndex(ArrayList<Timing> redTimings, long offset){
+		for (int i=0; i<redTimings.size();i++){
+			if (i==redTimings.size()-1){
+				Range r = new Range(redTimings.get(i).getOffset(),Long.MAX_VALUE);
+				if (r.contains(offset)){
+					return i;
+				}
+			}
+			Range r = new Range(redTimings.get(i).getOffset(),redTimings.get(i+1).getOffset());
+			if (r.contains(offset)){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public static ArrayList<Timing> getTimingPoints(File f) throws Exception{
 		ArrayList<Timing> output = new ArrayList<Timing>();
 		if (f == null || !(f.exists())){
@@ -439,14 +514,6 @@ public class OsuUtils {
 							System.exit(-1);
 						}
 					}
-					else if (line.contains("Mode:")){
-						int mode = Integer.parseInt(line.substring(6));
-						if (mode!=SUPPORTED_PLAY_MODE){
-							String errMsg = "The currently supported mode is mania";
-							JOptionPane.showMessageDialog(null, errMsg);
-							System.exit(-1);            
-						}
-					} 
 					break;
 				case 1:
 					// timing points

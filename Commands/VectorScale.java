@@ -41,23 +41,23 @@ public class VectorScale extends Command {
 	private void setParameters(double startScaleX, double startScaleY, double endScaleX, double endScaleY){
 		this.startScaleX = startScaleX;
 		this.startScaleY = startScaleY;
-		this.endScaleX = endScaleX;
-		this.endScaleY = endScaleY;
+		this.setEndScaleX(endScaleX);
+		this.setEndScaleY(endScaleY);
 	}
 	
 	@Override
 	public Command clone() {
-		return new VectorScale(easing, startTime,endTime,startScaleX,startScaleY,endScaleX,endScaleY);
+		return new VectorScale(easing, startTime,endTime,startScaleX,startScaleY,getEndScaleX(),getEndScaleY());
 	}
 
 	@Override
 	public String toString() {
 		String startX = OsuUtils.formatDoubleToString(startScaleX);
-		String endX = OsuUtils.formatDoubleToString(endScaleX);
+		String endX = OsuUtils.formatDoubleToString(getEndScaleX());
 		String startY = OsuUtils.formatDoubleToString(startScaleY);
-		String endY = OsuUtils.formatDoubleToString(endScaleY);
-		String y = OsuUtils.formatDoubleToString(endScaleY-startScaleY);
-		String x = OsuUtils.formatDoubleToString(endScaleX-startScaleX); 
+		String endY = OsuUtils.formatDoubleToString(getEndScaleY());
+		String y = OsuUtils.formatDoubleToString(getEndScaleY()-startScaleY);
+		String x = OsuUtils.formatDoubleToString(getEndScaleX()-startScaleX); 
 		if (x.equals(y)){
 			if (startX.equals(endX)){
 				if (startX.equals("1")){
@@ -74,6 +74,13 @@ public class VectorScale extends Command {
 		return startScaleX;
 	}
 
+	public void setSize(double size){
+		setStartScaleX(size);
+		setStartScaleY(size);
+		setEndScaleX(size);
+		setEndScaleY(size);
+	}
+	
 	public void setStartScaleX(double startScaleX) {
 		this.startScaleX = startScaleX;
 	}
