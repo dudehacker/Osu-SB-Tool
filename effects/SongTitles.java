@@ -3,76 +3,76 @@ package effects;
 public class SongTitles {
 	public static final String[] jp = {
 			//1. Mattete Ai no Uta - Aqours -> 01
-			"待ってて愛のうた",
+			"1. 待ってて愛のうた",
 
 			//2. Kaguya no Shiro de Odoritai - u's -> 02
-			"輝夜の城で踊りたい",
+			"2. 輝夜の城で踊りたい",
 
 			//3. Humming Friend - Aqours -> 03
-			"ハミングフレンド",
+			"3. ハミングフレンド",
 
 			//4. Koi ni Naritai AQUARIUM - Aqours -> 01
-			"恋になりたいAQUARIUM",
+			"4. 恋になりたいAQUARIUM",
 
 			//5. Paradise Live - u's -> 4
-			"Paradise Live",
+			"5. Paradise Live",
 
 			//6. Yume Kataru yori Yume Utaou - Aqours ->5
-			"ユメ語るよりユメ歌おう",
+			"6. ユメ語るよりユメ歌おう",
 
 			//7. Yume no Tobira - u's ->6
-			"ユメノトビラ",
+			"7. ユメノトビラ",
 
 			//8. Kitto Seishun ga Kikoeru - u's ->2
-			"きっと青春が聞こえる",
+			"8. きっと青春が聞こえる",
 
 			//9. Music S.T.A.R.T!! - u's ->7
-			"Music S.T.A.R.T!!",
+			"9. Music S.T.A.R.T!!",
 
 			//10. Snow halation - u's ->8
-			"Snow halation",
+			"10. Snow halation",
 
 			//11. Takaramonozu - u's ->4
-			"タカラモノズ",
+			"11. タカラモノズ",
 
 			//12. Sore wa Bokutachi no Kiseki - u's ->9
-			"それは僕たちの奇跡",
+			"12. それは僕たちの奇跡",
 
 			//13. Kimi no Kokoro wa Kagayaiteru Kai? - Aqours ->10
-			"君のこころは輝いてるかい？",
+			"13. 君のこころは輝いてるかい?",
 
 			//14. COLORFUL VOICE - u's ->11
-			"COLORFUL VOICE",
+			"14. COLORFUL VOICE",
 
 			//15. Todokanai Hoshi da to Shitemo - Aqours ->1
-			"届かない星だとしても",
+			"15. 届かない星だとしても",
 
 			//16. KiRa-KiRa Sensation! - u's ->12
-			"KiRa-KiRa Sensation!",
+			"16. KiRa-KiRa Sensation!",
 
 			//17. Bokura wa Ima no Naka de - u's ->13
-			"僕らは今のなかで",
+			"17. 僕らは今のなかで",
 
 			//18. No brand girls - u's ->14
-			"No brand girls",
+			"18. No brand girls",
 
 			//19. Aozora Jumping Heart - Aqours ->3
-			"青空 Jumping Heart",
+			"19. 青空 Jumping Heart",
 
 			//20. Bokura no LIVE Kimi to no LIFE - u's ->15
-			"僕らのLIVE 君とのLIFE",
+			"20. 僕らのLIVE 君とのLIFE",
 
 			//21. Aqours*HEROES - Aqours ->10
-			"Aqours*HEROES",
+			"21. Aqours☆HEROES",
 
 			//22. MOMENT RING - u's ->16
-			"MOMENT RING",
+			"22. MOMENT RING",
 
 			//23. Sayounara e Sayonara! - u's ->16
-			"さようならへさよなら！",
+			"23. さようならへさよなら!",
 
 			//24. Aishiteru Banzai - u's ->17
-			"愛してるばんざーい",
+			"24. 愛してるばんざーい",
 	};
 
 	public static final String[] en = {
@@ -117,7 +117,7 @@ public class SongTitles {
 			//20. 
 			"Bokura no LIVE Kimi to no LIFE",
 			//21. 
-			"Aqours*HEROES",
+			"Aqours☆HEROES",
 			//22.
 			"MOMENT RING",
 			//23. 

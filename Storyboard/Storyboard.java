@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import java.util.Properties;
 
+import Commands.Fade;
 import effects.Effects;
 import Objects.Layer;
 import Objects.VisualObject;
@@ -36,6 +37,19 @@ public class Storyboard {
 	public Storyboard(boolean isDifficultySpecific){
 		readFromProperty(OsuUtils.startPath);
 		osuFile = OsuUtils.getOsuFile(defaultPath);
+		writeToProperty(OsuUtils.startPath);
+		//System.out.println(osuFile);
+		if (isDifficultySpecific==false){
+			outputFile = getSBFile();
+		} else{
+			outputFile = osuFile;
+		}
+		//System.out.println(outputFile);
+	}
+	
+	public Storyboard(boolean isDifficultySpecific, File file){
+		readFromProperty(OsuUtils.startPath);
+		osuFile = file;
 		writeToProperty(OsuUtils.startPath);
 		//System.out.println(osuFile);
 		if (isDifficultySpecific==false){
@@ -70,6 +84,12 @@ public class Storyboard {
 
 	}
 
+	public void disableBG(VisualObject bg){
+		bg.setLayer(Layer.Background);
+		bg.add(new Fade(0,0,0,0));
+		add(bg);
+	}
+	
 private void writeToProperty(String path) {
 	Properties prop = new Properties();
 	OutputStream output = null;
@@ -221,6 +241,22 @@ private void writeToProperty(String path) {
 			e.printStackTrace();
 		}
 		OsuUtils.exportBeatmap(outputFile, toString());
+	}
+	
+	public void exportSB(String subFolderName){
+		File output = null;
+		try {
+			String osuName = osuFile.getName();
+			String osb = osuName.substring(0, osuName.indexOf(" [")) + ".osb";
+			new File(subFolderName).mkdir();
+			output = new File(subFolderName + "\\" + osb);
+			output.createNewFile();
+		} catch (IOException e) {
+			System.out.println(output.getAbsolutePath());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		OsuUtils.exportBeatmap(output, toString());
 	}
 
 	public File getOsuFile() {

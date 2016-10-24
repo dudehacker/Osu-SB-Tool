@@ -16,7 +16,7 @@ public class CharacterPopUp extends Effects{
 	private long fadeIn = 500;
 	private File osuFile;
 	private int volume = 100;
-	private int[] group = 
+	public static int[] group = 
 			// u's = 0
 			// Aqours = 1
 		{
@@ -70,18 +70,27 @@ public class CharacterPopUp extends Effects{
 				0,
 		};
 	
-	public CharacterPopUp(File osuFile){
+	public CharacterPopUp(File osuFile, String waifu, int groupID){
 		this.osuFile = osuFile;
+		this.waifu = waifu;
+		this.groupID = groupID;
 		try {
 			ArrayList<Timing> timings = OsuUtils.getKiaiStartTiming(osuFile);
 			ArrayList<Timing> songs = OsuUtils.getRedTimingPoints(osuFile);
+
 			int i =0;
+
+			
+			
 			for (Timing timing : timings){
 				long t = timing.getOffset();
+
+
 				i = OsuUtils.getSongIndex(songs, t);
 				String charPath = charSpriteRNG(group[i],osuFile);
 				String voicePath = charPath.replace(".png", ".wav");
-				add(new Sample(t,voicePath,volume));
+				long newT = t ;
+				add(new Sample(newT,voicePath,volume));
 				Color color = null;
 				double maxFade = 1;
 				if (charPath.contains("Maki")){
@@ -138,14 +147,16 @@ public class CharacterPopUp extends Effects{
 					color = AqoursColors.Riko();
 				}
 
-				addFlash(t,color,maxFade);
-				addCharacter(t,charPath);
-				addHearts(t);
+				addFlash(newT,color,maxFade);
+				addCharacter(newT,charPath);
+				addHearts(newT);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+
 	
 	private String charSpriteRNG(int groupID, File osuFile){
 		String output = "";

@@ -3,6 +3,7 @@ package effects.customEffects;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
+import java.util.Random;
 
 import Commands.*;
 import Objects.*;
@@ -81,6 +82,41 @@ public class TextDisplay extends Effects{
 				}
 			}
 		}
+	}
+	
+
+	public TextDisplay(CoordinateType c , File osuFile, String text, long startT, long endT, int x, int y,double size, double degrees,int dXY, double dr[], double direction){
+		if (c.equals(CoordinateType.HitObject)){
+			x = OsuUtils.hitObjectXToStoryboardX(x);
+			y = OsuUtils.hitObjectYToStoryboardY(y);
+		}
+		double radian = OsuUtils.degreesToRadian(degrees);
+		String[] paths = getAllFilePath(text);
+		int middle = text.length()/2;
+		Dimension[] allXY = calculateAllXY(osuFile.getParent(), text, x, y , size, radian);
+		for (int i = 0; i < text.length(); i++){
+			String filePath = paths[i];
+			if (!filePath.equals("null")){
+				int startX = allXY[i].width;
+				int startY = allXY[i].height;
+				VisualObject o = createCharacter(filePath,Easing.Linear,startT,endT,startX,startY,startFade,endFade,size);
+				double xdirection = 1;
+				if (i>middle){
+					xdirection = 0;
+				}
+				int dx = (int) (dXY * Math.pow(-1, xdirection));
+				int dy = (int) (dXY * Math.pow(-1, direction));
+				o.add(new Move(startT,endT,startX,startY, startX +dx, startY+dy));	
+				addRotation( o, dr[i], startT,endT);
+
+			}
+		}
+	}
+	
+	private void addRotation(VisualObject o, double dr, long startT, long endT){
+		Rotate r1 = new Rotate(startT,endT,0,dr);
+		o.add(r1);
+
 	}
 	
 	

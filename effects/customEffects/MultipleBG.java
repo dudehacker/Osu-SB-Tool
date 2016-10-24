@@ -9,6 +9,8 @@ import Commands.ColorCMD;
 import Commands.Command;
 import Commands.CommandName;
 import Commands.Fade;
+import Commands.Move;
+import Commands.Rotate;
 import Commands.SpriteMove;
 import Commands.CameraMove;
 import Commands.VectorScale;
@@ -87,17 +89,20 @@ public class MultipleBG extends Effects{
 			CameraMove.toBottomRight
 	};
 	private final double coverSize = 0.5;
-	private final int TitleBoxX = 600;
+	private final int TitleBoxX = 550;
 	private final int TitleBoxY = 400;
-	private final int titleDY = 75;
+	private final int titleDX = 20;
+	private final int titleDY = 20;
 	private final int BPMboxX = TitleBoxX- 90;
 	private final int BPMboxY = TitleBoxY - 65;
-	private final int bpmX = TitleBoxX-120;
+	private final int bpmX = TitleBoxX-135;
 	private final int bpmNumberX = BPMboxX +25;
 	private final int bpmTextX = bpmNumberX - 70;
 	private File osuFile ;
 	private double bpmSize = 0.2;
 	private final double speed = 100.0/47567.0;
+	private final int flashDuration = 600;
+	
 	
 	public MultipleBG(File osuFile){
 		this.osuFile = osuFile;
@@ -109,46 +114,38 @@ public class MultipleBG extends Effects{
 			VisualObject blackBG = new Sprite(CoordinateType.Storyboard, Layer.Background,blackBGPath,x, y);
 			blackBG.add(new VectorScale(0, endTimings[endTimings.length-1],2,2));
 			add(blackBG);
+			
 			for (int i = 0; i< startTimings.size();i++){
 				Timing t = startTimings.get(i);
 				long startTime = t.getOffset();
 				long kiaiStart = kiaiTimings.get(i).getOffset();
+				long flashEnd = kiaiStart ;
 				long endTime = endTimings[i];
 				String filePath = BGFolder + (i+1) + ".jpg";
 				String fullBGPath = osuFile.getParent() + "\\" + filePath;
 				double size = OsuUtils.getImageToSBSize(fullBGPath);
+				addFlashBang(kiaiStart);
 				createBG(filePath, startTime, endTime,x,y,startFade,endFade,size,move[i]);
 				String coverPath = coverFolder + (covers[i]) + ".jpg";
 				loadCover(coverPath,startTime,x,y,startFade,endFade,coverSize);
 				String bpmBGPath = BPMFolder + "bpm.png";
 				String shootingStarPath = EffectsConstants.sbPath + "shooting star.png";
-				addFlashBang(kiaiStart);
-				createShootingStars(shootingStarPath, kiaiStart, endTime-kiaiStart, TitleBoxY, t.getBPM());
-				CreateBPMDisplay(bpmBGPath,startTime, endTime,TitleBoxX,TitleBoxY,startFade,endFade,size);	
+				createShootingStars(shootingStarPath, flashEnd, endTime-flashEnd, TitleBoxY, t.getBPM());
+				CreateBPMDisplay(bpmBGPath,flashEnd, endTime,TitleBoxX,TitleBoxY,startFade,endFade,480.0*1.1/768.0);	
 				String bpmPath = BPMFolder + "bpm_"+songTypes[i] + ".png";
-				CreateBPMDisplay(bpmPath,startTime+1, endTime,bpmX,TitleBoxY,startFade,endFade,0.7);
+				CreateBPMDisplay(bpmPath,flashEnd+1, endTime,bpmX,TitleBoxY,startFade,endFade,0.7);
 				String titlePath = BPMFolder + "title_"+songTypes[i] + ".png";
-				CreateBPMDisplay(titlePath,startTime+1, endTime,BPMboxX,BPMboxY,startFade,endFade,0.7);
-				
+				CreateBPMDisplay(titlePath,flashEnd+1, endTime,BPMboxX,BPMboxY,startFade,endFade,0.7);			
 				String text = "" + t.getBPM() ;
-				Color color = Color.WHITE;
-				/*
-				switch(songTypes[i]){
-				case 1:
-					color = new Color(34,153,255);
-					break;
-				case 2:
-					color = new Color(0,238,51);
-					break;
-				case 3:
-					color = new Color(255,51,102);
-					break;
-				}*/
-				addText(color,text,startTime,endTime,bpmNumberX,BPMboxY);
+				addText(Color.white,text,flashEnd,endTime,bpmNumberX,BPMboxY);
+				Color color = new Color(141,252,255);
+				if (CharacterPopUp.group[i]==0){
+					color = new Color(223,115,255);
+				}
 				String en = SongTitles.en[i];
-				addText(color,en,startTime,endTime,bpmNumberX,TitleBoxY+titleDY);
+				addTitle(color,en,flashEnd,endTime,bpmNumberX - 35,TitleBoxY+titleDY,0.15 * 19.0/en.length(),0);
 				String jp = SongTitles.jp[i];
-				addText(color,jp,startTime,endTime,bpmNumberX,TitleBoxY-titleDY);
+				addTitle(color,jp,flashEnd,endTime,bpmNumberX-titleDX,TitleBoxY-titleDY,0.15 * 16.0/jp.length(),1);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -157,8 +154,7 @@ public class MultipleBG extends Effects{
 	
 	private void addFlashBang(long startT){
 		String filename = EffectsConstants.charPopupPath + "flash2.jpg";
-		long duration = 200;
-		FlashBang flash = new FlashBang(osuFile, filename,startT-1,duration);
+		FlashBang flash = new FlashBang(osuFile, filename,startT-1,flashDuration);
 		add(flash);
 	}
 	
@@ -182,10 +178,34 @@ public class MultipleBG extends Effects{
 		
 	}
 	
+	private void addTitle(Color c,String text, long startT, long endT, int x, int y, double titleSize, double direction){
+		double dr[] = new double[text.length()];
+		Random rng = new Random();
+		for (int i = 0; i< text.length();i++){
+			dr[i]= Math.toRadians(40)* Math.pow(-1, rng.nextInt(2)); 
+		}
+		TextDisplay e= new TextDisplay(CoordinateType.Storyboard, osuFile,text,startT, endT, x, y,titleSize , 0,5,dr,direction);
+		e.removeAll(CommandName.Fade);
+		long t1 = startT-fadeIn;
+		long t2 = startT;
+		long t3 = endT;
+		long t4 = endT+fadeOut;
+		Command f1 = new Fade(Easing.QuintIn ,t1,t2,startFade,1);
+		Command f2 = new Fade(t2,t3);
+		Command f3 = new Fade(Easing.QuintOut,t3,t4,1,endFade);
+		e.addAll(f1);
+		e.addAll(f2);
+		e.addAll(f3);
+		ColorCMD color = new ColorCMD(startT,endT,c);
+		e.addAll(color);
+		add(e);
+		
+		
+	}
 
 	
 	private void addText(Color c,String text, long startT, long endT, int x, int y){
-		TextDisplay e= new TextDisplay(CoordinateType.Storyboard, osuFile,text,startT, endT, x, y,bpmSize , 0,false);
+		TextDisplay e= new TextDisplay(CoordinateType.Storyboard, osuFile,text,startT, endT, x, y,bpmSize*0.8 , 0,false);
 		e.removeAll(CommandName.Fade);
 		long t1 = startT-fadeIn;
 		long t2 = startT;
