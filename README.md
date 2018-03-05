@@ -1,4 +1,5 @@
 # SB-Tool
+A java library for Osu Storyboard Scripting (https://osu.ppy.sh/help/wiki/Storyboard_Scripting)
 
 Purpose
 -----------------------------
@@ -12,9 +13,7 @@ Objective
 3. Optimise code to reduce size of osb file
 4. User can map a set of effects to each unique hitsound in osu file, then set some default parameters for each effect and program can generate osb file for you.
 
-Ultimate Goal
----------------------------
-mp3 -> osb 
+
 
 The code was made for this map:
 https://osu.ppy.sh/s/514038
